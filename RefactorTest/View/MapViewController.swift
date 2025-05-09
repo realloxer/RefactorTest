@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MapViewController.swift
 //  RefactorTest
 //
 //  Created by Dave Duprey on 28/04/2025.
@@ -10,8 +10,8 @@ import MapKit
 import W3WSwiftApi
 
 
-class ViewController: UIViewController, MKMapViewDelegate {
-    
+class MapViewController: UIViewController, MKMapViewDelegate {
+
     let api = What3WordsV4(apiKey: "CTF89056")
     lazy var label = UILabel(frame: CGRect(x: 64.0, y: 64.0, width: view.frame.width - 128.0, height: 32.0))
     lazy var label2 = UILabel(frame: CGRect(x: 64.0, y: 64.0, width: view.frame.width - 128.0, height: 32.0))
@@ -101,8 +101,4 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
         return pinView
     }
-}
-
-class ColorPointAnnotation: MKPointAnnotation {
-    var color: UIColor?
 }
