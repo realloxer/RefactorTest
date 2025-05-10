@@ -44,7 +44,7 @@ final class MapViewController: UIViewController, MKMapViewDelegate {
     }
 
     private func setupViewModel() {
-        viewModel = MapViewModel(service: What3WordsService(apiKey: "CTF89056"))
+        viewModel = MapViewModel(service: What3WordsV4Service(apiKey: "CTF89056"))
         viewModel.$mainText
             .receive(on: DispatchQueue.main)
             .assign(to: \.text, on: mainLabel)
