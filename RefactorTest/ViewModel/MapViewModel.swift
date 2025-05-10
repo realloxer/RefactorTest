@@ -22,11 +22,16 @@ final class MapViewModel: NSObject {
     }
 
     func selectCoordinate(_ coordinate: CLLocationCoordinate2D) {
-        service.convertTo3wa(coordinate: coordinate) { [weak self] square, _ in
-            let annotation = ColorPointAnnotation()
-            annotation.coordinate = coordinate
-            annotation.title = square?.words ?? "\(coordinate.latitude), \(coordinate.longitude)"
-            annotation.color = .red
+        service.convertTo3wa(coordinate: coordinate) { [weak self] square, error in
+            guard error == nil else {
+                #if DEBUG
+                print("Error: \(error!)")
+                #endif
+                // We can send error to MapViewController to display error UI here...
+                return
+            }
+            let title = square?.words ?? "\(coordinate.latitude), \(coordinate.longitude)"
+            let annotation = ColorPointAnnotation(coordinate: coordinate, title: title, color: .red)
 
             DispatchQueue.main.async {
                 self?.mainText = annotation.title ?? ""
@@ -36,13 +41,17 @@ final class MapViewModel: NSObject {
 
         let antipode = antipode(for: coordinate)
 
-        service.convertTo3wa(coordinate: antipode) { [weak self] square, _ in
+        service.convertTo3wa(coordinate: antipode) { [weak self] square, error in
+            guard error == nil else {
+                #if DEBUG
+                print("Error: \(error!)")
+                #endif
+                // We can send error to MapViewController to display error UI here...
+                return
+            }
             guard let coordinate = square?.coordinates else { return }
-
-            let annotation = ColorPointAnnotation()
-            annotation.coordinate = coordinate
-            annotation.title = square?.words ?? "\(coordinate.latitude), \(coordinate.longitude)"
-            annotation.color = .blue
+            let title = square?.words ?? "\(coordinate.latitude), \(coordinate.longitude)"
+            let annotation = ColorPointAnnotation(coordinate: coordinate, title: title, color: .blue)
 
             DispatchQueue.main.async {
                 self?.antipodeText = annotation.title ?? ""
