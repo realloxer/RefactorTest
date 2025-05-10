@@ -7,6 +7,6 @@
 
 import MapKit
 
-class ColorPointAnnotation: MKPointAnnotation {
+final class ColorPointAnnotation: MKPointAnnotation {
     var color: UIColor?
 }

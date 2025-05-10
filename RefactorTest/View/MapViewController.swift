@@ -10,50 +10,52 @@ import MapKit
 import W3WSwiftApi
 import Combine
 
-class MapViewController: UIViewController, MKMapViewDelegate {
+final class MapViewController: UIViewController, MKMapViewDelegate {
 
-    lazy var label = UILabel(frame: CGRect(x: 64.0, y: 64.0, width: view.frame.width - 128.0, height: 32.0))
-    lazy var label2 = UILabel(frame: CGRect(x: 64.0, y: 64.0, width: view.frame.width - 128.0, height: 32.0))
-    private var mapView = MKMapView()
+    private var mainLabel: UILabel!
+    private var antipodeLabel: UILabel!
+    private var mapView: MKMapView!
     private var viewModel: MapViewModel!
     private var cancellables: Set<AnyCancellable> = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        mapView.delegate = self
-        self.view = mapView
-        label.textAlignment = .center
-        label.layer.cornerRadius = 8.0
-        label.font = .boldSystemFont(ofSize: 24.0)
-        label.backgroundColor = .white
-        label.textColor = .red
-        label.frame = CGRect(x: 64.0, y: 64.0, width: 300.0, height: 32.0)
-        view.addSubview(label)
-        label2.textAlignment = .center
-        label2.layer.cornerRadius = 8.0
-        label2.font = .boldSystemFont(ofSize: 24.0)
-        label2.backgroundColor = .white
-        label2.textColor = .blue
-        label2.frame = CGRect(x: 64.0, y: 100.0, width: 300.0, height: 32.0)
-        view.addSubview(label2)
-
-        let service = What3WordsService(apiKey: "CTF89056")
-        viewModel = MapViewModel(service: service)
-        bindData()
+        setupMapView()
+        setupLabels()
+        setupViewModel()
     }
 
-    private func bindData() {
-        viewModel?.$mainText
+    deinit {
+        cancellables.forEach { $0.cancel() }
+        cancellables.removeAll()
+    }
+
+    private func setupMapView() {
+        mapView = MKMapView()
+        mapView.delegate = self
+        self.view = mapView
+    }
+
+    private func setupLabels() {
+        mainLabel = UILabel.mapLabel(topOffset: 64, textColor: .red)
+        antipodeLabel = UILabel.mapLabel(topOffset: 100, textColor: .blue)
+        view.addSubview(mainLabel)
+        view.addSubview(antipodeLabel)
+    }
+
+    private func setupViewModel() {
+        viewModel = MapViewModel(service: What3WordsService(apiKey: "CTF89056"))
+        viewModel.$mainText
             .receive(on: DispatchQueue.main)
-            .assign(to: \.text, on: label)
+            .assign(to: \.text, on: mainLabel)
             .store(in: &cancellables)
 
-        viewModel?.$antipodeText
+        viewModel.$antipodeText
             .receive(on: DispatchQueue.main)
-            .assign(to: \.text, on: label2)
+            .assign(to: \.text, on: antipodeLabel)
             .store(in: &cancellables)
 
-        viewModel?.$tappedAnnotation
+        viewModel.$tappedAnnotation
             .receive(on: DispatchQueue.main)
             .sink { [weak self] annotation in
                 guard let self, let annotation else { return }
@@ -61,7 +63,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             }
             .store(in: &cancellables)
 
-        viewModel?.$antipoleAnnotation
+        viewModel.$antipoleAnnotation
             .receive(on: DispatchQueue.main)
             .sink { [weak self] annotation in
                 guard let self, let annotation else { return }

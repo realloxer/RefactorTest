@@ -9,7 +9,7 @@ import Foundation
 import CoreLocation
 import MapKit
 
-class MapViewModel: NSObject {
+final class MapViewModel: NSObject {
     @Published var mainText: String? = "Select a square"
     @Published var antipodeText: String? = ""
     @Published var tappedAnnotation: ColorPointAnnotation?
